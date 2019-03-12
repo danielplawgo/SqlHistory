@@ -12,7 +12,7 @@ namespace SqlHistory
     {
         static DataContext()
         {
-            //DbInterception.Add(new TemporalTableCommandTreeInterceptor());
+            DbInterception.Add(new TemporalTableCommandTreeInterceptor());
         }
 
         public DataContext()
@@ -31,6 +31,6 @@ namespace SqlHistory
 
         public DbSet<BaseProduct> Products { get; set; }
 
-        //public DbSet<Order> Orders { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }

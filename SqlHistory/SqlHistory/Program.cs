@@ -11,6 +11,8 @@ namespace SqlHistory
     {
         static void Main(string[] args)
         {
+            HibernatingRhinos.Profiler.Appender.EntityFramework.EntityFrameworkProfiler.Initialize();
+
             //AddAndUpdateProductWithoutHistory();
 
             int productId = 0;
@@ -26,8 +28,45 @@ namespace SqlHistory
             ShowProductInCategoryLazyLoadingProblem();
 
             ShowProductInCategoryLinq();
+
+            int orderId = AddProductsToOrder();
+
+            RemoveProductFromOrder(orderId, productId);
         }
-                                                                                                                  
+
+        private static int AddProductsToOrder()
+        {
+            using (DataContext db = new DataContext())
+            {
+                var products = db.Products.OfType<Product>();
+
+                var order = new Order()
+                {
+                    Number = "order number",
+                    Products = products.Cast<BaseProduct>().ToList()
+                };
+
+                db.Orders.Add(order);
+                db.SaveChanges();
+
+                return order.Id;
+            }
+        }
+
+        private static void RemoveProductFromOrder(int orderId, int productId)
+        {
+            using (DataContext db = new DataContext())
+            {
+                var order = db.Orders.FirstOrDefault(o => o.Id == orderId);
+
+                var product = order.Products.FirstOrDefault(p => p.Id == productId);
+
+                order.Products.Remove(product);
+
+                db.SaveChanges();
+            }
+        }
+
         private static void ShowProductInCategoryLinq()
         {
             Console.WriteLine("ShowProductInCategoryLinq:");
